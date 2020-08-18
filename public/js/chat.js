@@ -8,9 +8,17 @@ const form = document.getElementById('send-message-form');
 
 form.addEventListener('submit', E => {
     E.preventDefault();
-    let msg = Event.target.elements.message.value;
+    let msg = E.target.elements.message.value;
 
-    socket.emit('sendMsg', msg);
+    /**
+     * Event sendMsg
+     * var msg
+     * Event Acknowledgements
+     */
+    socket.emit('sendMsg', msg, (error) => {
+        if (error) return console.log(error);
+        console.log('Message delivered!');
+    });
 });
 
 document.getElementById('share-location').addEventListener('click', () => {
@@ -25,6 +33,6 @@ document.getElementById('share-location').addEventListener('click', () => {
             latitude: location.coords.latitude
         };
 
-        socket.emit('shareLocation', location);
+        socket.emit('shareLocation', location, (message) => console.log(message));
     });
 });

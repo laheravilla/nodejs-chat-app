@@ -4,6 +4,7 @@ const path = require('path');
 const http = require('http');
 const express = require('express');
 const socketio = require('socket.io'); // Docs on https://socket.io/
+const Filter = require('bad-words'); // Docs on https://github.com/web-mech/badwords#readme
 
 const app = express();
 const server = http.createServer(app); // Create a separated new server
@@ -27,9 +28,21 @@ io.on('connection', (socket) => {
     socket.broadcast.emit('message', 'A new user has joined!');
 
     // Server emits to all client connections
-    socket.on('sendMsg', (msg) => io.emit('message', msg));
+    socket.on('sendMsg', (msg, callback) => {
+        const filter = new Filter();
 
-    socket.on('shareLocation', (location) => io.emit('message', `https://google.com/maps?q=${location.latitude},${location.longitude}`))
+        if (filter.isProfane(msg)) {
+            return callback('Profanity is not allowed!')
+        }
+
+        io.emit('message', msg);
+        callback('Delivered!');
+    });
+
+    socket.on('shareLocation', (location, callback) => {
+        io.emit('message', `https://google.com/maps?q=${location.latitude},${location.longitude}`);
+        callback('Location shared!');
+    })
 
     // On disconnection
     socket.on('disconnect', () => io.emit('message', 'A user has left!'));
