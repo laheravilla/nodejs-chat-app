@@ -6,7 +6,12 @@
 </head>
 <body>
     <h1>Chat App</h1>
-    <button id="js-increment">+1</button>
+    <form id="send-message-form" action="">
+        <textarea placeholder="Write message here..." name="message"></textarea>
+        <button style="display: block">Send</button>
+    </form>
+    <button id="share-location">Share location</button>
+
     <script src="/socket.io/socket.io.js"></script>
     <script src="/js/chat.js"></script>
 </body>
