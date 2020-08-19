@@ -6,13 +6,26 @@ const socket = io();
 const messageForm = document.getElementById('send-message-form');
 const messageFormTextarea = messageForm.elements.message;
 const messageFormBtn = messageForm.elements.btnSend;
+const messagesOutput = document.getElementById('messages-output');
+
+// Templates
+const messageTemplate = document.getElementById('message-template');
+const locationMessageTemplate = document.getElementById('location-message-template');
 
 const resetMessage = () => {
     messageFormTextarea.value = '';
     messageFormBtn.setAttribute('disabled', 'disabled'); // Disable button once submitted
 };
 
-socket.on('message', (msg) => console.log(msg));
+socket.on('message', (message) => {
+    const html = Mustache.render(messageTemplate.innerHTML, { message });
+    messagesOutput.insertAdjacentHTML('beforeend', html);
+});
+
+socket.on('locationMessage', (url) => {
+    const html = Mustache.render(locationMessageTemplate.innerHTML, { url });
+    messagesOutput.insertAdjacentHTML('beforeend', html);
+});
 
 resetMessage();
 
