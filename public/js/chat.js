@@ -18,7 +18,10 @@ const resetMessage = () => {
 };
 
 socket.on('message', (message) => {
-    const html = Mustache.render(messageTemplate.innerHTML, { message });
+    const html = Mustache.render(messageTemplate.innerHTML, {
+        message: message.text,
+        createdAt: moment(message.createdAt).format('h:mm:ss a')
+    });
     messagesOutput.insertAdjacentHTML('beforeend', html);
 });
 
