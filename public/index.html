@@ -3,28 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <title>Chat App</title>
+    <link rel="stylesheet" href="./css/styles.min.css">
+    <link rel="icon" href="./img/favicon.png">
 </head>
 <body>
-    <h1>Chat App</h1>
+    <section class="chat">
+        <div class="chat__sidebar">
 
-    <section id="messages-output"></section>
-
-    <form id="send-message-form" action="">
-        <textarea placeholder="Write message here..." name="message"></textarea>
-        <button style="display: block" name="btnSend">Send</button>
-    </form>
-    <button id="share-location">Share location</button>
+        </div>
+        <div class="chat__main">
+            <div id="messages-output" class="chat__messages"></div>
+            <div class="compose">
+                <form id="send-message-form" action="">
+                    <textarea placeholder="Write message here..." name="message"></textarea>
+                    <button style="display: block" name="btnSend">Send</button>
+                </form>
+                <button id="share-location">Share location</button>
+            </div>
+        </div>
+    </section>
 
     <script id="message-template" type="text/html">
-        <div class="msg">
-            <p><small>{{createdAt}}</small> {{message}}</p>
+        <div class="message">
+            <p>
+                <span class="message__name">John Doe</span>
+                <span class="message__meta">{{createdAt}}</span>
+            </p>
+            <p>{{message}}</p>
         </div>
     </script>
 
     <script id="location-message-template" type="text/html">
-        <div class="url">
+        <div class="message">
             <p>
-                <a href="{{url}}" target="_blank"><small>See my current location!</small></a>
+                <span class="message__name">John Doe</span>
+                <span class="message__meta">{{createdAt}}</span>
+            </p>
+            <p>
+                <a href="{{url}}" target="_blank">See my current location!</a>
             </p>
         </div>
     </script>

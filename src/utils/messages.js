@@ -4,5 +4,11 @@ module.exports = {
             text,
             createdAt: new Date().getTime()
         };
+    },
+    generateLocationMessage(url) {
+        return {
+            url,
+            createdAt: new Date().getTime()
+        };
     }
 };

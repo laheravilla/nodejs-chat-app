@@ -25,15 +25,17 @@ socket.on('message', (message) => {
     messagesOutput.insertAdjacentHTML('beforeend', html);
 });
 
-socket.on('locationMessage', (url) => {
-    const html = Mustache.render(locationMessageTemplate.innerHTML, { url });
+socket.on('locationMessage', (message) => {
+    const html = Mustache.render(locationMessageTemplate.innerHTML, {
+        url: message.url,
+        createdAt: moment(message.createdAt).format('h:mm:ss a')
+    });
     messagesOutput.insertAdjacentHTML('beforeend', html);
 });
 
 resetMessage();
 
 messageFormTextarea.addEventListener('keyup', e => {
-    console.log(e.currentTarget.value)
     if (e.currentTarget.value !== '') {
         messageFormBtn.removeAttribute('disabled'); // Enable button
     } else {
@@ -56,7 +58,6 @@ messageForm.addEventListener('submit', e => {
         messageFormTextarea.focus();
 
         if (error) return console.log(error);
-        console.log('Message delivered!');
     });
 });
 
@@ -77,8 +78,6 @@ document.getElementById('share-location').addEventListener('click', (e) => {
 
         socket.emit('shareLocation', location, (message) => {
             shareLocationBtn.removeAttribute('disabled'); // Enable button
-
-            console.log(message);
         });
     });
 });
