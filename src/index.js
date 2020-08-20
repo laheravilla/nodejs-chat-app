@@ -16,17 +16,22 @@ const publicDirPath = path.join(__dirname, '../public');
 
 app.use(express.static(publicDirPath));
 
-let message = "Welcome to our app ";
-
 // On connection event
 io.on('connection', (socket) => {
     console.log('New WebSocket connection');
 
-    // Server emits to a single client connection
-    socket.emit('message', msg.generateMessage('Welcome!'));
+    socket.on('join', ({ username, room }) => {
+        socket.join(room); // Join a room chat
 
-    // Server emits to everybody except for the current connection
-    socket.broadcast.emit('message', msg.generateMessage('A new user has joined!'));
+        // Server emits to a single client connection
+        socket.emit('message', msg.generateMessage('Welcome!'));
+
+        // Server emits to everybody except for the current connection
+        // socket.broadcast.emit('message', msg.generateMessage('A new user has joined!'));
+
+        // Server emits to everybody in the current chat room
+        socket.broadcast.to(room).emit('message', msg.generateMessage(`${username} has joined!`));
+    });
 
     // Server emits to all client connections
     socket.on('sendMsg', (message, callback) => {
@@ -36,7 +41,8 @@ io.on('connection', (socket) => {
             return callback('Profanity is not allowed!')
         }
 
-        io.emit('message', msg.generateMessage(message));
+        // io.emit('message', msg.generateMessage(message));
+        io.to('Stgo de Cuba').emit('message', msg.generateMessage(message));
         callback('Delivered!');
     });
 

@@ -12,6 +12,11 @@ const messagesOutput = document.getElementById('messages-output');
 const messageTemplate = document.getElementById('message-template');
 const locationMessageTemplate = document.getElementById('location-message-template');
 
+// Options
+// console.log(new URL(window.location.href).searchParams.get('username'))
+const { username, room } = Qs.parse(location.search, { ignoreQueryPrefix: true }); // Get params from URL
+console.log(room)
+
 const resetMessage = () => {
     messageFormTextarea.value = '';
     messageFormBtn.setAttribute('disabled', 'disabled'); // Disable button once submitted
@@ -81,3 +86,5 @@ document.getElementById('share-location').addEventListener('click', (e) => {
         });
     });
 });
+
+socket.emit('join', { username, room });
