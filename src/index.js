@@ -6,6 +6,7 @@ const express = require('express');
 const socketio = require('socket.io'); // Docs on https://socket.io/
 const Filter = require('bad-words'); // Docs on https://github.com/web-mech/badwords#readme
 const msg = require('./utils/messages');
+const usrs = require('./utils/users');
 
 const app = express();
 const server = http.createServer(app); // Create a separated new server
@@ -20,8 +21,12 @@ app.use(express.static(publicDirPath));
 io.on('connection', (socket) => {
     console.log('New WebSocket connection');
 
-    socket.on('join', ({ username, room }) => {
-        socket.join(room); // Join a room chat
+    socket.on('join', (options, callback) => {
+        const { error, user } = usrs.addUser({ id: socket.id, ...options }); // Id is provided by socket
+        if (error) return callback(error);
+
+        socket.join(user.room); // Join a room chat
+        console.log('room: ', user.room)
 
         // Server emits to a single client connection
         socket.emit('message', msg.generateMessage('Welcome!'));
@@ -30,11 +35,14 @@ io.on('connection', (socket) => {
         // socket.broadcast.emit('message', msg.generateMessage('A new user has joined!'));
 
         // Server emits to everybody in the current chat room
-        socket.broadcast.to(room).emit('message', msg.generateMessage(`${username} has joined!`));
+        socket.broadcast.to(user.room).emit('message', msg.generateMessage(`${user.username} has joined!`));
+
+        callback();
     });
 
     // Server emits to all client connections
-    socket.on('sendMsg', (message, callback) => {
+    socket.on('sendMessage', (message, callback) => {
+        console.log('server -> ', message)
         const filter = new Filter();
 
         if (filter.isProfane(message)) {
@@ -42,8 +50,8 @@ io.on('connection', (socket) => {
         }
 
         // io.emit('message', msg.generateMessage(message));
-        io.to('Stgo de Cuba').emit('message', msg.generateMessage(message));
-        callback('Delivered!');
+        io.to('france').emit('message', msg.generateMessage(message));
+        callback();
     });
 
     socket.on('shareLocation', (location, callback) => {
@@ -55,7 +63,10 @@ io.on('connection', (socket) => {
     })
 
     // On disconnection
-    socket.on('disconnect', () => io.emit('message', msg.generateMessage('A user has left!')));
+    socket.on('disconnect', () => {
+        const user = usrs.removeUser(socket.id);
+        if (user) io.to(user.room).emit('message', msg.generateMessage(`${user.username} has left!`))
+    });
 });
 
 server.listen(port, () => console.log('Server is up on port ' + port));

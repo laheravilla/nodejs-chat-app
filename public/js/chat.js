@@ -15,7 +15,6 @@ const locationMessageTemplate = document.getElementById('location-message-templa
 // Options
 // console.log(new URL(window.location.href).searchParams.get('username'))
 const { username, room } = Qs.parse(location.search, { ignoreQueryPrefix: true }); // Get params from URL
-console.log(room)
 
 const resetMessage = () => {
     messageFormTextarea.value = '';
@@ -23,6 +22,7 @@ const resetMessage = () => {
 };
 
 socket.on('message', (message) => {
+    console.log(message);
     const html = Mustache.render(messageTemplate.innerHTML, {
         message: message.text,
         createdAt: moment(message.createdAt).format('h:mm:ss a')
@@ -31,6 +31,7 @@ socket.on('message', (message) => {
 });
 
 socket.on('locationMessage', (message) => {
+    console.log(message);
     const html = Mustache.render(locationMessageTemplate.innerHTML, {
         url: message.url,
         createdAt: moment(message.createdAt).format('h:mm:ss a')
@@ -51,14 +52,15 @@ messageFormTextarea.addEventListener('keyup', e => {
 messageForm.addEventListener('submit', e => {
     e.preventDefault();
 
-    let msg = e.target.elements.message.value;
+    let message = e.target.elements.message.value;
 
     /**
      * Event sendMsg
      * var msg
      * Event Acknowledgements
      */
-    socket.emit('sendMsg', msg, (error) => {
+    socket.emit('sendMessage', message, (error) => {
+        console.log(message);
         resetMessage()
         messageFormTextarea.focus();
 
@@ -87,4 +89,9 @@ document.getElementById('share-location').addEventListener('click', (e) => {
     });
 });
 
-socket.emit('join', { username, room });
+socket.emit('join', { username, room }, (error) => {
+    if (error) {
+        alert(error);
+        location.href = '/'; // Redirect to login
+    }
+});
