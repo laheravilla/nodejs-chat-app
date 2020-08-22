@@ -36,6 +36,12 @@ io.on('connection', (socket) => {
         // Server emits to everybody in the current chat room
         socket.broadcast.to(user.room).emit('message', msg.generateMessage('Admin', `${user.username} has joined!`));
 
+        //
+        io.to(user.room).emit('roomData', {
+            room: user.room,
+            users: usrs.getUsersInRoom(user.room)
+        });
+
         callback();
     });
 
@@ -65,7 +71,13 @@ io.on('connection', (socket) => {
     // On disconnection
     socket.on('disconnect', () => {
         const user = usrs.removeUser(socket.id);
-        if (user) io.to(user.room).emit('message', msg.generateMessage('Admin',`${user.username} has left!`))
+        if (user) {
+            io.to(user.room).emit('message', msg.generateMessage('Admin', `${user.username} has left!`));
+            io.to(user.room).emit('roomData', {
+                room: user.room,
+                users: usrs.getUsersInRoom(user.room)
+            });
+        }
     });
 });
 

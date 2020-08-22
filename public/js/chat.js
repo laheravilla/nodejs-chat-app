@@ -11,6 +11,7 @@ const messagesOutput = document.getElementById('messages-output');
 // Templates
 const messageTemplate = document.getElementById('message-template');
 const locationMessageTemplate = document.getElementById('location-message-template');
+const sidebarTemplate = document.getElementById('sidebar-template');
 
 // Options
 // console.log(new URL(window.location.href).searchParams.get('username'))
@@ -40,6 +41,10 @@ socket.on('locationMessage', (message) => {
 });
 
 resetMessage();
+
+socket.on('roomData', ({ room, users }) => {
+    document.getElementById('sidebar').innerHTML = Mustache.render(sidebarTemplate.innerHTML, {room, users});
+});
 
 messageFormTextarea.addEventListener('keyup', e => {
     if (e.currentTarget.value !== '') {
